@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: blog-frontend
+  labels:
+    app: frontend
+    tier: frontend
+data:
+  # API Configuration
+  VITE_API_BASE_URL: "https://api.yourdomain.com/api/v1"
+  
+  # Application Configuration
+  VITE_APP_NAME: "Blog Generation AI"
+  VITE_APP_VERSION: "2.0.0"

@@ -1,0 +1,50 @@
+---
+# Frontend IngressRoute (HTTPS)
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: frontend-https
+  namespace: blog-frontend
+  labels:
+    app: frontend
+    tier: frontend
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`blog.yourdomain.com`)
+      kind: Rule
+      services:
+        - name: frontend
+          namespace: blog-frontend
+          port: 80
+      middlewares:
+        - name: security-headers
+          namespace: blog-frontend
+        - name: frontend-rate-limit
+          namespace: blog-frontend
+  tls:
+    secretName: frontend-tls-cert
+---
+# Frontend IngressRoute (HTTP → HTTPS Redirect)
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: frontend-http
+  namespace: blog-frontend
+  labels:
+    app: frontend
+    tier: frontend
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`blog.yourdomain.com`)
+      kind: Rule
+      services:
+        - name: frontend
+          namespace: blog-frontend
+          port: 80
+      middlewares:
+        - name: https-redirect
+          namespace: blog-frontend

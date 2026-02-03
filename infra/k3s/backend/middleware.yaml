@@ -1,0 +1,59 @@
+---
+# Traefik Middleware: Rate Limiting for Backend API
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: api-rate-limit
+  namespace: blog-backend
+spec:
+  rateLimit:
+    average: 50
+    burst: 100
+    period: 1m
+---
+# Traefik Middleware: Strip /api Prefix
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-api-prefix
+  namespace: blog-backend
+spec:
+  stripPrefix:
+    prefixes:
+      - /api
+---
+# Traefik Middleware: Security Headers for API
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: api-security-headers
+  namespace: blog-backend
+spec:
+  headers:
+    customResponseHeaders:
+      X-Content-Type-Options: "nosniff"
+      X-Frame-Options: "DENY"
+    sslRedirect: true
+    stsSeconds: 31536000
+---
+# Traefik Middleware: CORS Headers
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: api-cors
+  namespace: blog-backend
+spec:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    accessControlAllowOriginList:
+      - https://blog.yourdomain.com
+    accessControlAllowHeaders:
+      - "*"
+    accessControlAllowCredentials: true
+    accessControlMaxAge: 100
+    addVaryHeader: true

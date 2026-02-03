@@ -1,0 +1,65 @@
+---
+# Backend API IngressRoute (HTTPS)
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-https
+  namespace: blog-backend
+  labels:
+    app: backend
+    tier: backend
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`api.yourdomain.com`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: backend
+          namespace: blog-backend
+          port: 8000
+      middlewares:
+        - name: api-security-headers
+          namespace: blog-backend
+        - name: api-rate-limit
+          namespace: blog-backend
+        - name: api-cors
+          namespace: blog-backend
+        - name: strip-api-prefix
+          namespace: blog-backend
+  tls:
+    secretName: backend-tls-cert
+---
+# Backend API IngressRoute (HTTP → HTTPS Redirect)
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-http
+  namespace: blog-backend
+  labels:
+    app: backend
+    tier: backend
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.yourdomain.com`)
+      kind: Rule
+      services:
+        - name: backend
+          namespace: blog-backend
+          port: 8000
+      middlewares:
+        - name: https-redirect
+          namespace: blog-frontend
+---
+# Traefik Middleware: HTTPS Redirect (reference from frontend)
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: https-redirect
+  namespace: blog-backend
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
