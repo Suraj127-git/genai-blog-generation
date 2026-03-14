@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, Depends
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserProfile
 from app.models.user import UserCreate, User, get_password_hash, verify_password
 from app.auth.jwt import create_access_token

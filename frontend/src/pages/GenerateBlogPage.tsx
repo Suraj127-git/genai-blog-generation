@@ -288,7 +288,7 @@ const GenerateBlogPage: React.FC = () => {
                     <div className={`card blog-${currentBlog.topic_category}`}>
                         <div className="mb-6 flex items-center justify-between">
                             <div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">{current Blog.title}</h3>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-2">{currentBlog.title}</h3>
                                 <div className="flex items-center gap-3 text-sm text-gray-600">
                                     <span className="px-2 py-1 bg-white rounded-lg">
                                         {currentBlog.topic_category}

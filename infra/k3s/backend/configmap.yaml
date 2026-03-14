@@ -9,15 +9,15 @@ metadata:
 data:
   # Database Configuration
   MONGODB_DB_NAME: "blog_generation"
-  CHROMADB_PORT: "443"
+  CHROMADB_PORT: "8000"
   
   # Application Configuration
   GROQ_DEFAULT_MODEL: "llama-3.3-70b-versatile"
   APP_NAME: "Blog Generation API"
-  DEBUG: "false"
+  DEBUG: "true"  # Enable debug for local development
   
-  # CORS Configuration
-  CORS_ORIGINS: '["https://blog.yourdomain.com"]'
+  # CORS Configuration (local development)
+  CORS_ORIGINS: '["http://localhost:30000", "http://blog.local.k3s", "https://blog.local.k3s"]'
   
   # JWT Configuration
   JWT_ALGORITHM: "HS256"

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from app.config import settings
 from app.database.mongodb import connect_to_mongo, close_mongo_connection
 from app.database.chromadb import chroma_client
-from app.routers import auth, blogs, documents
+from app.routers import auth, blogs, documents, health
 import logging
 
 # Configure logging
@@ -21,31 +21,37 @@ async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events"""
     # Startup
     logger.info("Starting application...")
-    await connect_to_mongo()
     
+    # Try to connect to MongoDB but don't fail if it doesn't work
+    try:
+        await connect_to_mongo()
+        logger.info("Connected to MongoDB")
+    except Exception as e:
+        logger.warning(f"MongoDB connection failed: {e}")
+    
+    # Try to connect to ChromaDB but don't fail if it doesn't work
     try:
         chroma_client.connect()
+        logger.info("Connected to ChromaDB")
     except Exception as e:
         logger.warning(f"ChromaDB connection failed: {e}")
-    
-    logger.info("Application started successfully")
     
     yield
     
     # Shutdown
     logger.info("Shutting down application...")
     await close_mongo_connection()
-    logger.info("Application shut down complete")
 
 
+# Create FastAPI app
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="Advanced Blog Generation API with AI",
+    description="AI-powered blog generation platform",
     lifespan=lifespan
 )
 
-# CORS Middleware
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -55,18 +61,19 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix="/api/v1")
-app.include_router(blogs.router, prefix="/api/v1")
-app.include_router(documents.router, prefix="/api/v1")
+app.include_router(health.router)
+app.include_router(auth.router, prefix="/api/v1/auth")
+app.include_router(blogs.router, prefix="/api/v1/blogs")
+app.include_router(documents.router, prefix="/api/v1/documents")
 
 
 @app.get("/")
 async def root():
     """Root endpoint"""
     return {
-        "name": settings.app_name,
+        "message": "Welcome to Blog Generation API",
         "version": settings.app_version,
-        "status": "running"
+        "docs": "/docs"
     }
 
 

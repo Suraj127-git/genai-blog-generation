@@ -42,47 +42,58 @@
          └──────────────────────┘          └──────────────────────┘
 ```
 
-## 🚀 Quick Start
+## 🚀 Quick Start (k3d)
 
-### Prerequisites
+The easiest way to run the platform locally is using k3d:
 
-- **MongoDB Atlas** account (free tier available)
-- **ChromaDB** instance (cloud or self-hosted)
-- **GroqAI API Key** (free tier available)
-- **Domain name** (optional, for production)
-
-### Local Development
-
-1. **Clone the repository**
+1. **Set up k3d cluster and build images:**
    ```bash
-   git clone https://github.com/yourusername/genai-blog-generation.git
-   cd genai-blog-generation
+   ./setup-local-k3d.sh
    ```
 
-2. **Backend Setup**
+2. **Deploy the application:**
+   ```bash
+   cd infra/k3s
+   ./deploy.sh
+   ```
+
+3. **Access the application:**
+   - Frontend: http://blog.local.k3s
+   - Backend API: http://api.local.k3s/docs
+
+4. **Clean up when done:**
+   ```bash
+   ./teardown-k3d.sh
+   ```
+
+## Local Development (without Kubernetes)
+
+For traditional local development:
+
+1. **Backend:**
    ```bash
    cd backend
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
    pip install -r requirements.txt
-   cp .env.example .env
-   # Edit .env with your credentials
-   uvicorn app.main:app --reload
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-3. **Frontend Setup**
+2. **Frontend:**
    ```bash
    cd frontend
    npm install
-   cp .env.example .env
-   # Edit .env with API URL
    npm run dev
    ```
 
-4. **Access the Application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+## Infrastructure
+
+The project is configured for k3d deployment with:
+
+- **Backend**: FastAPI with MongoDB and ChromaDB
+- **Frontend**: Simple HTML/JS served by Nginx
+- **Ingress**: Traefik for routing
+- **DNS**: Automatic configuration of local domains
+
+See `infra/k3s/README.md` for detailed infrastructure documentation.
 
 ## 📚 Documentation
 

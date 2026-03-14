@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Generation AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: #2563eb; font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { color: #64748b; font-size: 1.1rem; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #374151; }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;
+        }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .btn { 
+            background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; 
+            font-size: 16px; cursor: pointer; font-weight: 500;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .status { margin-top: 10px; padding: 10px; border-radius: 6px; }
+        .status.info { background: #dbeafe; color: #1e40af; }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Blog Generation AI</h1>
+            <p>Generate high-quality blog content using AI</p>
+        </div>
+
+        <div class="card">
+            <h2>Generate New Blog</h2>
+            <form id="blogForm">
+                <div class="form-group">
+                    <label for="topic">Topic</label>
+                    <input type="text" id="topic" name="topic" placeholder="Enter blog topic..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select category...</option>
+                        <option value="technology">Technology</option>
+                        <option value="business">Business</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="education">Education</option>
+                        <option value="health">Health</option>
+                        <option value="entertainment">Entertainment</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="language">Language</label>
+                    <select id="language" name="language" required>
+                        <option value="english">English</option>
+                        <option value="spanish">Spanish</option>
+                        <option value="french">French</option>
+                        <option value="german">German</option>
+                        <option value="chinese">Chinese</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="context">Additional Context (Optional)</label>
+                    <textarea id="context" name="context" placeholder="Any specific points to include in the blog..."></textarea>
+                </div>
+
+                <button type="submit" class="btn" id="generateBtn">Generate Blog</button>
+                
+                <div id="status" class="status" style="display: none;"></div>
+            </form>
+        </div>
+
+        <div id="blogResult" class="card" style="display: none;">
+            <h2>Generated Blog</h2>
+            <div id="blogContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.protocol + '//' + (window.location.hostname === 'blog.local.k3s' ? 'api.local.k3s' : 'localhost:8000') + '/api/v1';
+        
+        document.getElementById('blogForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const statusEl = document.getElementById('status');
+            const resultEl = document.getElementById('blogResult');
+            const contentEl = document.getElementById('blogContent');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // Show loading status
+            statusEl.className = 'status info';
+            statusEl.textContent = 'Generating blog... This may take a moment.';
+            statusEl.style.display = 'block';
+            resultEl.style.display = 'none';
+            generateBtn.disabled = true;
+            
+            try {
+                const formData = new FormData(e.target);
+                const data = {
+                    topic: formData.get('topic'),
+                    category: formData.get('category'),
+                    language: formData.get('language'),
+                    context: formData.get('context') || null
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/blogs/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Display result
+                contentEl.innerHTML = `
+                    <h3>${result.title}</h3>
+                    <p><strong>Category:</strong> ${result.category} | <strong>Language:</strong> ${result.language}</p>
+                    <div style="margin-top: 20px; line-height: 1.6;">
+                        ${result.content.split('\n').map(p => `<p>${p}</p>`).join('')}
+                    </div>
+                `;
+                
+                statusEl.className = 'status success';
+                statusEl.textContent = 'Blog generated successfully!';
+                resultEl.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                statusEl.className = 'status error';
+                statusEl.textContent = `Error: ${error.message}`;
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
