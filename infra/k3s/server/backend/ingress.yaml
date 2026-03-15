@@ -1,0 +1,27 @@
+---
+# Backend API IngressRoute (HTTPS for production)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-https
+  namespace: blog-backend
+  labels:
+    app: backend
+    tier: backend
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`api.yourdomain.com`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: backend
+          namespace: blog-backend
+          port: 8000
+      middlewares:
+        - name: api-cors
+          namespace: blog-backend
+        - name: strip-api-prefix
+          namespace: blog-backend
+  tls:
+    certResolver: letsencrypt

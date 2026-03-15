@@ -1,0 +1,35 @@
+---
+# Traefik Middleware: Strip /api Prefix
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-api-prefix
+  namespace: blog-backend
+spec:
+  stripPrefix:
+    prefixes:
+      - /api
+---
+# Traefik Middleware: CORS Headers (Local Development)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: api-cors
+  namespace: blog-backend
+spec:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    accessControlAllowOriginList:
+      - http://blog.local.k3s
+      - https://blog.local.k3s
+      - http://localhost:30000
+    accessControlAllowHeaders:
+      - "*"
+    accessControlAllowCredentials: true
+    accessControlMaxAge: 100
+    addVaryHeader: true

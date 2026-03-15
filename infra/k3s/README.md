@@ -1,40 +1,61 @@
-# k3d Infrastructure
+# k3s Infrastructure
 
-This directory contains the Kubernetes manifests for deploying the Blog Generation Platform on k3d.
+This directory contains the Kubernetes manifests for deploying the Blog Generation Platform on Kubernetes clusters.
 
 ## Structure
 
 ```
 infra/k3s/
 ├── README.md              # This file
-├── deploy.sh              # Deployment script
-├── namespaces.yaml         # Namespace definitions
-├── backend/               # Backend resources
-│   ├── configmap.yaml     # Backend configuration
-│   ├── deployment.yaml    # Backend deployment
-│   ├── service.yaml       # Backend service
-│   ├── middleware.yaml    # Traefik middlewares
-│   ├── ingress.yaml       # Traefik ingress route
-│   └── secrets.yaml.example # Example secrets
-└── frontend/              # Frontend resources
-    ├── configmap.yaml     # Frontend configuration
-    ├── deployment.yaml    # Frontend deployment
-    ├── service.yaml       # Frontend service
-    ├── middleware.yaml    # Traefik middlewares
-    └── ingress.yaml       # Traefik ingress route
+├── deploy.sh              # Main deployment script (environment selector)
+├── local/                 # Local development configurations
+│   ├── deploy-local.sh    # Local deployment script
+│   ├── namespaces.yaml    # Namespace definitions
+│   ├── backend/           # Backend resources for local dev
+│   │   ├── configmap.yaml
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   ├── middleware.yaml
+│   │   ├── ingress.yaml
+│   │   └── secrets.yaml.example
+│   └── frontend/          # Frontend resources for local dev
+│       ├── configmap.yaml
+│       ├── deployment.yaml
+│       ├── service.yaml
+│       ├── middleware.yaml
+│       └── ingress.yaml
+└── server/                # Production server configurations
+    ├── deploy-server.sh   # Production deployment script
+    ├── namespaces.yaml    # Namespace definitions
+    ├── backend/           # Backend resources for production
+    │   ├── configmap.yaml
+    │   ├── deployment.yaml
+    │   ├── service.yaml
+    │   ├── middleware.yaml
+    │   ├── ingress.yaml
+    │   └── secrets.yaml.example
+    └── frontend/          # Frontend resources for production
+        ├── configmap.yaml
+        ├── deployment.yaml
+        ├── service.yaml
+        ├── middleware.yaml
+        └── ingress.yaml
 ```
 
 ## Quick Start
+
+### Local Development
 
 1. Set up the k3d cluster and build images:
    ```bash
    ./setup-local-k3d.sh
    ```
 
-2. Deploy the application:
+2. Deploy to local environment:
    ```bash
    cd infra/k3s
    ./deploy.sh
+   # Select option 1 for Local
    ```
 
 3. Verify the deployment:
@@ -46,6 +67,24 @@ infra/k3s/
    - Frontend: http://blog.local.k3s
    - Backend API: http://api.local.k3s/docs
 
+### Production Server
+
+1. Deploy to production server:
+   ```bash
+   cd infra/k3s
+   ./deploy.sh
+   # Select option 2 for Production Server
+   ```
+
+2. Update domain configurations:
+   - Edit `server/backend/ingress.yaml` and `server/frontend/ingress.yaml`
+   - Replace `yourdomain.com` with your actual domain
+   - Configure TLS certificates
+
+3. Access the application:
+   - Frontend: https://yourdomain.com
+   - Backend API: https://api.yourdomain.com/docs
+
 ## Teardown
 
 To remove all resources from the cluster:
@@ -53,7 +92,20 @@ To remove all resources from the cluster:
 ./teardown-k3d.sh
 ```
 
-## Configuration
+## Configuration Differences
+
+### Local Environment
+- Uses `.local.k3s` domains
+- HTTP traffic only (no TLS)
+- Local MongoDB and service endpoints
+- Development-optimized settings
+
+### Production Environment
+- Uses custom domains (`yourdomain.com`)
+- HTTPS with TLS certificates
+- Production service endpoints
+- Production-optimized settings
+- Higher resource limits and replicas
 
 ### Backend Secrets
 
@@ -70,10 +122,16 @@ Required secrets:
 
 ### DNS Configuration
 
+**Local Development:**
 The setup script automatically adds entries to `/etc/hosts`:
 ```
 192.168.107.2 blog.local.k3s api.local.k3s
 ```
+
+**Production:**
+Configure your DNS to point:
+- `yourdomain.com` → your cluster load balancer
+- `api.yourdomain.com` → your cluster load balancer
 
 ## Development Workflow
 

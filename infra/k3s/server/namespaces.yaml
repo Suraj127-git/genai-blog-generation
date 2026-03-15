@@ -1,0 +1,18 @@
+---
+# Namespace for Backend Services
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blog-backend
+  labels:
+    app: blog-generation
+    tier: backend
+---
+# Namespace for Frontend Services
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blog-frontend
+  labels:
+    app: blog-generation
+    tier: frontend

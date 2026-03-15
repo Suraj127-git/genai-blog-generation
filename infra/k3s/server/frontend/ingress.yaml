@@ -1,0 +1,22 @@
+---
+# Frontend IngressRoute (HTTPS for production)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: frontend-https
+  namespace: blog-frontend
+  labels:
+    app: frontend
+    tier: frontend
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`yourdomain.com`)
+      kind: Rule
+      services:
+        - name: frontend
+          namespace: blog-frontend
+          port: 80
+  tls:
+    certResolver: letsencrypt
