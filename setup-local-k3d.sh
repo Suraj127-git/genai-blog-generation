@@ -115,7 +115,7 @@ show_next_steps() {
     echo ""
     echo -e "${YELLOW}3. Deploy the application:${NC}"
     echo "   cd infra/k3s"
-    echo "   ./deploy-local.sh"
+    echo "   ./deploy.sh"
     echo ""
     echo -e "${YELLOW}4. Access the application:${NC}"
     echo "   Frontend: http://blog.local.k3s"

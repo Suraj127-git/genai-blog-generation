@@ -63,8 +63,7 @@ echo -e "${YELLOW}Step 4: Deploying Frontend${NC}"
 kubectl apply -f frontend/configmap.yaml
 kubectl apply -f frontend/deployment.yaml
 kubectl apply -f frontend/service.yaml
-# Skip HPA for local development
-kubectl apply -f frontend/middleware.yaml
+# Skip HPA and middleware for local development
 kubectl apply -f frontend/ingress.yaml
 echo -e "${GREEN}✓ Frontend deployed${NC}"
 echo ""
