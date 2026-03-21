@@ -1,5 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { blogsAPI, BlogGenerateRequest, Blog, BlogHistoryResponse } from '../../api/blogs';
+import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import { blogsAPI } from '../../api/blogs';
+import type { BlogGenerateRequest, Blog, BlogHistoryResponse } from '../../api/blogs';
 
 interface BlogsState {
     currentBlog: Blog | null;

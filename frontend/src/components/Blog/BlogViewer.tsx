@@ -6,7 +6,7 @@ interface BlogViewerProps {
     topic_category?: string;
 }
 
-const BlogViewer: React.FC<BlogViewerProps> = ({ content, title, topic_category }) => {
+const BlogViewer: React.FC<BlogViewerProps> = ({ content, title: _title, topic_category }) => {
     const renderContent = () => {
         const lines = content.split('\n');
 

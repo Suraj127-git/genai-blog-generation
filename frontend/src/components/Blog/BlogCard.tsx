@@ -17,7 +17,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
     id,
     title,
     content,
-    topic,
+    topic: _topic,
     topic_category,
     created_at,
     generation_time,

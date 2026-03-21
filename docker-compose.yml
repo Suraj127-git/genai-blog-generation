@@ -1,0 +1,78 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: blog-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - blog-network
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: blog-chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=false
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - blog-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../infra/docker/backend.Dockerfile
+    container_name: blog-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - CORS_ORIGINS=["http://localhost:8080","http://localhost:5173","http://localhost:3000"]
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - blog-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../infra/docker/frontend.Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    container_name: blog-frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    networks:
+      - blog-network
+
+volumes:
+  mongodb_data:
+  chromadb_data:
+
+networks:
+  blog-network:
+    driver: bridge

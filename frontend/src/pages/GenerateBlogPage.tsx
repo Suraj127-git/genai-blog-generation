@@ -18,7 +18,7 @@ const GenerateBlogPage: React.FC = () => {
         document_ids: [] as string[],
     });
 
-    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [_uploadedFile, setUploadedFile] = useState<File | null>(null);
 
     useEffect(() => {
         dispatch(fetchDocuments());

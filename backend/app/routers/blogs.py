@@ -22,7 +22,7 @@ import math
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/blogs", tags=["blogs"])
+router = APIRouter(tags=["blogs"])
 
 
 def categorize_topic(topic: str) -> BlogTopic:

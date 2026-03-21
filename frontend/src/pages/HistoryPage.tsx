@@ -5,7 +5,7 @@ import { fetchBlogHistory, deleteBlog } from '../features/blogs/blogsSlice';
 
 const HistoryPage: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { history, total, page, totalPages, loading } = useAppSelector((state) => state.blogs);
+    const { history, total: _total, page, totalPages, loading } = useAppSelector((state) => state.blogs);
     const [search, setSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
 

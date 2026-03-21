@@ -1,10 +1,11 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { documentsAPI, DocumentUploadResponse, DocumentListResponse } from '../../api/documents';
+import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import { documentsAPI } from '../../api/documents';
+import type { DocumentUploadResponse, DocumentListResponse } from '../../api/documents';
 
 interface DocumentsState {
     documents: DocumentUploadResponse[];
     total: number;
-    uploading: false;
+    uploading: boolean;
     loading: boolean;
     error: string | null;
 }
